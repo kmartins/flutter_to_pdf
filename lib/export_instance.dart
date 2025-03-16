@@ -2,40 +2,39 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-
 import 'package:pdf/widgets.dart' as pw;
 
 import 'capture_wrapper.dart';
 import 'export_delegate.dart';
 import 'utils.dart';
-import 'widgets/container.dart';
+import 'widgets/align.dart';
+import 'widgets/button.dart';
 import 'widgets/center.dart';
-import 'widgets/sized_box.dart';
-import 'widgets/fitted_box.dart';
-import 'widgets/limited_box.dart';
-import 'widgets/constrained_box.dart';
+import 'widgets/checkbox.dart';
 import 'widgets/clip.dart';
-import 'widgets/transform.dart';
+import 'widgets/column.dart';
+import 'widgets/constrained_box.dart';
+import 'widgets/container.dart';
+import 'widgets/divider.dart';
+import 'widgets/expanded.dart';
+import 'widgets/fitted_box.dart';
+import 'widgets/flexible.dart';
+import 'widgets/grid_view.dart';
+import 'widgets/image.dart';
+import 'widgets/limited_box.dart';
+import 'widgets/list_view.dart';
 import 'widgets/opacity.dart';
 import 'widgets/padding.dart';
-import 'widgets/align.dart';
-import 'widgets/positioned.dart';
-import 'widgets/expanded.dart';
-import 'widgets/flexible.dart';
 import 'widgets/placeholder.dart';
+import 'widgets/positioned.dart';
+import 'widgets/row.dart';
+import 'widgets/sized_box.dart';
+import 'widgets/stack.dart';
+import 'widgets/table.dart';
 import 'widgets/text.dart';
 import 'widgets/text_field.dart';
-import 'widgets/divider.dart';
-import 'widgets/image.dart';
-import 'widgets/checkbox.dart';
-import 'widgets/button.dart';
-import 'widgets/column.dart';
-import 'widgets/row.dart';
-import 'widgets/stack.dart';
-import 'widgets/list_view.dart';
-import 'widgets/grid_view.dart';
+import 'widgets/transform.dart';
 import 'widgets/wrap.dart';
-import 'widgets/table.dart';
 
 /// The delegate handling the low-level export of the widget tree.
 class ExportInstance {
@@ -253,9 +252,16 @@ class ExportInstance {
           await (widget as Table).toPdfWidget(await _visit(element, context))
         ];
       case const (CaptureWrapper):
-        if (widget.key == null) {
+        final captureWrapper = (widget as CaptureWrapper);
+        if (widget.key == null && captureWrapper.customConverter == null) {
           throw Exception('Capture must have a key to be exported');
         }
+
+        if (captureWrapper.customConverter != null) {
+          final List children = await _visit(element, context);
+          return [captureWrapper.customConverter!.call(children.first)];
+        }
+
         Element? contextElement =
             findElement(context!, (CaptureWrapper e) => e.key == widget.key);
 
