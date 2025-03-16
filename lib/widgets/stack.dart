@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/widgets.dart'
     show Alignment, AlignmentDirectional, Stack, StackFit;
 import 'package:pdf/widgets.dart' as pw show Stack, Widget, StackFit, Overflow;
@@ -12,7 +14,8 @@ extension StackConverter on Stack {
             ? (alignment as Alignment).toPdfAlignment()
             : (alignment as AlignmentDirectional).toPdfAlignment(),
         fit: fit.toPdfStackFit(),
-        overflow: pw.Overflow.visible,
+        overflow:
+            clipBehavior != Clip.none ? pw.Overflow.clip : pw.Overflow.visible,
         children: children,
       );
 }
